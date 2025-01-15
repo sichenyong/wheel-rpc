@@ -1,7 +1,6 @@
 package com.scy;
 
-import com.scy.comomon.Invocation;
-import com.scy.protocol.HttpClient;
+
 import com.scy.proxy.ProxyFactory;
 
 public class Consumer {

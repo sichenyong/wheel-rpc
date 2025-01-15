@@ -1,6 +1,9 @@
 package com.scy.comomon;
 
-public class URL {
+import java.io.Serializable;
+import java.util.Objects;
+
+public class URL implements Serializable {
     private String Host;
     private Integer port;
 
@@ -23,5 +26,18 @@ public class URL {
 
     public void setPort(Integer port) {
         this.port = port;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        URL url = (URL) o;
+        return Objects.equals(Host, url.Host) && Objects.equals(port, url.port);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(Host, port);
     }
 }

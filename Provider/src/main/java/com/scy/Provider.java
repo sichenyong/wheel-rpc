@@ -1,18 +1,24 @@
 package com.scy;
 
+import com.scy.callback.HelloServiceErrorCallback;
 import com.scy.comomon.URL;
 import com.scy.protocol.HttpServer;
-import com.scy.register.LocalRegister;
-import com.scy.register.MapRemoteRegister;
+import com.scy.register.*;
 
 public class Provider {
+
     public static void main(String[] args) {
-        // 将实现类注册进去
+        // 实现类注册
         LocalRegister.regist(HelloService.class.getName(), "1.0", HelloServiceImpl.class);
-        // 注册中心注册
+        // 服务降级方法
+//        LocalCallbackRegister.regist(HelloService.class.getName(), "1.0", HelloServiceErrorCallback.class);
+        RedisCallbackRegister.regist(HelloService.class.getName(), "1.0", HelloServiceErrorCallback.class);
         URL url = new URL("localhost", 8000);
-        MapRemoteRegister.regist(HelloService.class.getName(), url);
-        HttpServer httpServer = new HttpServer();
-        httpServer.start(url.getHost(), url.getPort());
+        // 服务注册
+//        MapRemoteRegister.regist(HelloService.class.getName(), url);
+
+        RedisRemoteRegist.regist(HelloService.class.getName(), url);
+        HttpServer server = new HttpServer();
+        server.start(url.getHost(), url.getPort());
     }
 }
