@@ -28,24 +28,27 @@ public class ProxyFactory {
                 List<URL> list = RedisRemoteRegist.get(interfaceClazz.getName());
                 // 服务调用
                 Object result = null;
-
-
-                // TODO: 负载均衡
-                URL url = LoadBalance.random(list);
-                try {
-                    result = httpClient.send(url.getHost(), url.getPort(), invocation);
-                } catch (Exception e) {
-                    // error-callback=com.scy.HelloServiceErrorCallback
-                    // 调用服务降级方法
-                    String clazzName = RedisCallbackRegister.get(interfaceClazz.getName(), "1.0");
-//                    ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-//                    Class<?> clazz = classLoader.loadClass(clazzName);
-                    Class<?> clazz = Class.forName(clazzName);
-                    Method method1 = clazz.getMethod(method.getName(), method.getParameterTypes());
-                    result = method1.invoke(clazz.getConstructor().newInstance(), args);
-                    return result;
+                // 最大重试次数
+                int maxIter = 3;
+                while (maxIter > 0) {
+                    // TODO: 负载均衡
+                    URL url = LoadBalance.random(list);
+                    try {
+                        result = httpClient.send(url.getHost(), url.getPort(), invocation);
+                        break;
+                    } catch (Exception e) {
+                        // error-callback=com.scy.HelloServiceErrorCallback
+                        // 调用服务降级方法
+                        if (--maxIter == 0) {
+                            String clazzName = RedisCallbackRegister.get(interfaceClazz.getName(), "1.0");
+                            Class<?> clazz = Class.forName(clazzName);
+                            Method method1 = clazz.getMethod(method.getName(), method.getParameterTypes());
+                            result = method1.invoke(clazz.getConstructor().newInstance(), args);
+                            return result;
+                        }
+                        System.out.println("service exception, retry...");
+                    }
                 }
-
                 return result;
             }
         });
