@@ -5,13 +5,14 @@ import com.scy.comomon.Invocation;
 import com.scy.comomon.URL;
 import com.scy.loadbalance.LoadBalance;
 import com.scy.protocol.HttpClient;
-import com.scy.register.LocalCallbackRegister;
+
 import com.scy.register.MapRemoteRegister;
 import com.scy.register.RedisCallbackRegister;
 import com.scy.register.RedisRemoteRegist;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Collections;
 import java.util.List;
 
 public class ProxyFactory {
@@ -25,7 +26,13 @@ public class ProxyFactory {
 
                 HttpClient httpClient = new HttpClient();
                 // 服务发现
-                List<URL> list = RedisRemoteRegist.get(interfaceClazz.getName());
+                // 优先读取本地配置
+                List<URL> list = MapRemoteRegister.get(interfaceClazz.getName());
+                if (list == null || list.isEmpty()) {
+                    // 本地没有，尝试读取服务器上的
+                    System.out.println("开始读取注册中心中的配置");
+                    list = RedisRemoteRegist.get(interfaceClazz.getName());
+                }
                 // 服务调用
                 Object result = null;
                 // 最大重试次数
