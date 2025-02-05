@@ -39,8 +39,8 @@ public class ProxyFactory {
                 int maxIter = 3;
                 while (maxIter > 0) {
                     // TODO: 负载均衡
-                    URL url = LoadBalance.random(list);
                     try {
+                        URL url = LoadBalance.random(list);
                         result = httpClient.send(url.getHost(), url.getPort(), invocation);
                         break;
                     } catch (Exception e) {

@@ -73,7 +73,6 @@ public class Subscribe {
                 String key = parts[1];
 
                 if ("set".equalsIgnoreCase(action)) {
-                    if(key.contains("1.0")) continue;
                     String value = jedis.get(key);
                     List<URL> list = JSONArray.parseArray(value, URL.class);
                     for (URL url : list) {
@@ -82,6 +81,7 @@ public class Subscribe {
                     }
                 } else if ("del".equalsIgnoreCase(action)) {
                     System.out.println("[处理线程] 删除 Key: " + key);
+                    MapRemoteRegister.removeKey(key);
                 }
             }
         } catch (Exception e) {

@@ -11,6 +11,7 @@ public class RedisUtil {
     }
 
     private volatile static Jedis jedis;
+    private volatile static Jedis jedis0;
 
     public static Jedis getJedis() {
         if (jedis == null) {
@@ -23,5 +24,18 @@ public class RedisUtil {
             }
         }
         return jedis;
+    }
+
+    public static Jedis getJedis0() {
+        if (jedis0 == null) {
+            synchronized (Jedis.class) {
+                if (jedis0 == null) {
+                    jedis0 = new Jedis(REDIS_HOST, REDIS_PORT);
+                    jedis0.auth(PASSWORD);
+                    jedis0.select(0);
+                }
+            }
+        }
+        return jedis0;
     }
 }

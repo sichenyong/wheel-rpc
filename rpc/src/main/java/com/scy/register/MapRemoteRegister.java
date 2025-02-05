@@ -27,6 +27,14 @@ public class MapRemoteRegister {
         return map.get(interfaceName);
     }
 
+    public static void removeKey(String interfaceName) {
+        map = getFile();
+        // 移除对应key
+        assert map != null;
+        map.remove(interfaceName);
+        saveFile();
+    }
+
     private static void saveFile() {
         try (FileOutputStream fileOutputStream = new FileOutputStream("D:\\UserData\\temp.txt");
              ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
